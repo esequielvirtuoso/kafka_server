@@ -33,6 +33,17 @@ services:
       - zookeeper-2
     ports:
       - 29092:29092
+    # entrypoint:
+    #   - "sh"
+    #   - "-c"
+    #   - "echo -n \"Wait until Zookeeper is fully initiliazed...\"; \
+    #      ping -c 1 -w 5 zookeeper > /dev/null 2>&1; \
+    #      while [ \"$$(echo ruok | nc zookeeper 2181)\" != \"imok\" ]; do \
+    #        echo -n \"...\"; \
+    #        sleep 1; \
+    #      done; \
+    #      echo \"...done\"; \
+    #      /etc/confluent/docker/run"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
@@ -40,6 +51,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - my-network-name
   kafka-2:
     container_name: ${KAFKA_SERVICE_NAME_SECOND}
     image: confluentinc/cp-kafka:latest
@@ -48,6 +61,17 @@ services:
       - zookeeper-2
     ports:
       - 39092:39092
+    # entrypoint:
+    #   - "sh"
+    #   - "-c"
+    #   - "echo -n \"Wait until Zookeeper is fully initiliazed...\"; \
+    #      ping -c 1 -w 5 zookeeper > /dev/null 2>&1; \
+    #      while [ \"$$(echo ruok | nc zookeeper 2181)\" != \"imok\" ]; do \
+    #        echo -n \"...\"; \
+    #        sleep 1; \
+    #      done; \
+    #      echo \"...done\"; \
+    #      /etc/confluent/docker/run"
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
@@ -55,3 +79,5 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - my-network-name
