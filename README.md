@@ -1,2 +1,16 @@
 # kafka_server
-This is test and development kafka server environment
+
+This is a test and development kafka server environment.
+
+
+## Starting Kafka and Zookeeper Services
+
+```
+make env
+```
+
+## Remove Kafka and Zookeeper Services
+
+```
+make env-stop
+```
