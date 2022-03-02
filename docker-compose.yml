@@ -25,7 +25,7 @@ services:
     networks:
       - my-network-name
 
-  kafka_1:
+  kafka-1:
     container_name: ${KAFKA_SERVICE_NAME_FIRST}
     image: confluentinc/cp-kafka:latest
     depends_on:
@@ -33,17 +33,6 @@ services:
       - zookeeper-2
     ports:
       - 29092:29092
-    # entrypoint:
-    #   - "sh"
-    #   - "-c"
-    #   - "echo -n \"Wait until Zookeeper is fully initiliazed...\"; \
-    #      ping -c 1 -w 5 zookeeper > /dev/null 2>&1; \
-    #      while [ \"$$(echo ruok | nc zookeeper 2181)\" != \"imok\" ]; do \
-    #        echo -n \"...\"; \
-    #        sleep 1; \
-    #      done; \
-    #      echo \"...done\"; \
-    #      /etc/confluent/docker/run"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
@@ -53,6 +42,28 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - my-network-name
+  init_kafka_1:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - kafka-1
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server kafka-1:29092 --list
+
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka-1:29092 --create --if-not-exists --topic topic_test --replication-factor 1 --partitions 1
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka-1:29092 --list
+
+      echo -e 'Creating kafka consumer groups'
+      kafka-console-consumer.sh --topic topic_test --bootstrap-server kafka-1:29092 --group consumer_group_test
+      "
+    networks:
+      - my-network-name
+
   kafka-2:
     container_name: ${KAFKA_SERVICE_NAME_SECOND}
     image: confluentinc/cp-kafka:latest
@@ -61,17 +72,6 @@ services:
       - zookeeper-2
     ports:
       - 39092:39092
-    # entrypoint:
-    #   - "sh"
-    #   - "-c"
-    #   - "echo -n \"Wait until Zookeeper is fully initiliazed...\"; \
-    #      ping -c 1 -w 5 zookeeper > /dev/null 2>&1; \
-    #      while [ \"$$(echo ruok | nc zookeeper 2181)\" != \"imok\" ]; do \
-    #        echo -n \"...\"; \
-    #        sleep 1; \
-    #      done; \
-    #      echo \"...done\"; \
-    #      /etc/confluent/docker/run"
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
@@ -79,5 +79,26 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - my-network-name
+  init_kafka_2:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - kafka-2
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server kafka-2:39092 --list
+
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka-2:39092 --create --if-not-exists --topic topic_test --replication-factor 1 --partitions 1
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka-2:39092 --list
+
+      echo -e 'Creating kafka consumer groups'
+      kafka-console-consumer.sh --topic topic_test --bootstrap-server kafka-2:39092 --group consumer_group_test
+      "
     networks:
       - my-network-name
