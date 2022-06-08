@@ -1,4 +1,4 @@
-version: '2'
+version: '3.6'
 networks:
   my-network-name:
     name: ${NETWORK_NAME}
@@ -100,5 +100,15 @@ services:
       echo -e 'Creating kafka consumer groups'
       kafka-console-consumer.sh --topic topic_test --bootstrap-server kafka-2:39092 --group consumer_group_test
       "
+    networks:
+      - my-network-name
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    depends_on:
+      - kafka-1
+    ports:
+      - 19000:9000
+    environment:
+      KAFKA_BROKERCONNECT: kafka-1:9092
     networks:
       - my-network-name
