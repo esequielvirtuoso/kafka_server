@@ -9,6 +9,7 @@ ZOOKEEEPER_SERVICE_NAME_FIRST = zookeeper_server_1
 ZOOKEEEPER_SERVICE_NAME_SECOND = zookeeper_server_2
 KAFKA_SERVICE_NAME_FIRST = kafka_server_1
 KAFKA_SERVICE_NAME_SECOND = kafka_server_2
+KAF_DROP=kaf_drop
 
 env: ##@environment Create network, run kafka and zookeeper services.
 	NETWORK_NAME=${NETWORK_NAME} \
@@ -16,6 +17,7 @@ env: ##@environment Create network, run kafka and zookeeper services.
 	ZOOKEEEPER_SERVICE_NAME_SECOND=$(ZOOKEEEPER_SERVICE_NAME_SECOND) \
 	KAFKA_SERVICE_NAME_FIRST=${KAFKA_SERVICE_NAME_FIRST} \
 	KAFKA_SERVICE_NAME_SECOND=${KAFKA_SERVICE_NAME_SECOND} \
+	KAF_DROP=${KAF_DROP} \
 	docker-compose up -d
 
 env-stop: ##@environment Remove kafka and zookeeper containers.
